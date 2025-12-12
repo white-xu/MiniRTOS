@@ -1,0 +1,3 @@
+使用/学习
+MiniRTOS就是精简FreeRTOS的代码，通过学习本程序的代码，可以帮助你快速上手FreeRTOS/无缝衔接等等
+core-development分支包含测试通过的重点功能开发进度，使用它可以深入学习FreeRTOS源码

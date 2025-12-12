@@ -7,7 +7,7 @@ static void SystemClock_Config(void);
 TaskHandle_t Task1Task_Handler;
 static void task1_task(void *pvParameters);
 
-#define TASK2_TASK_PRIO 2
+#define TASK2_TASK_PRIO 3
 #define TASK2_STK_SIZE 560
 TaskHandle_t Task2Task_Handler;
 static void task2_task(void *pvParameters);
@@ -72,41 +72,51 @@ int main(void)
 	}
 }
 
+// static void task1_task(void *pvParameters)
+// {
+//     static uint32_t count1 = 0;
+// 	const uint32_t print_interval = 80000000;	/*大概6s的延时*/
+
+// 	PRINT_INFO("enter task1");
+
+// 	while (1)
+// 	{
+// 		count1++;
+
+// 		if (count1 >= print_interval)
+// 		{
+// 			PRINT_INFO("task1:%lu (total loops)", count1);
+// 			count1 = 0;
+// 		}
+// 	}
+// }
+
+//任务都处于阻塞状态,空闲任务运行
 static void task1_task(void *pvParameters)
 {
     static uint32_t count1 = 0;
-	const uint32_t print_interval = 80000000;	/*大概6s的延时*/
 
 	PRINT_INFO("enter task1");
 
 	while (1)
 	{
 		count1++;
-
-		if (count1 >= print_interval)
-		{
-			PRINT_INFO("task1:%lu (total loops)", count1);
-			count1 = 0;
-		}
+		PRINT_INFO("task1:%lu (total loops)", count1);
+		vTaskDelay(pdMS_TO_TICKS(1500));
 	}
 }
 
 static void task2_task(void *pvParameters)
 {
     static uint32_t count2 = 0;
-	const uint32_t print_interval = 150000000;
 
 	PRINT_INFO("enter task2");
 
 	while (1)
 	{
 		count2++;
-
-		if (count2 >= print_interval)
-		{
-			PRINT_INFO("task2:%lu (total loops)", count2);
-			count2 = 0;
-		}
+		PRINT_INFO("task2:%lu (total loops)", count2);
+		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
 

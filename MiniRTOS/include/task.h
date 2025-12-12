@@ -39,6 +39,7 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,
 void vTaskStartScheduler(void);
 BaseType_t xTaskIncrementTick(void);
 void vTaskSwitchContext(void);
+void vTaskDelay(const TickType_t xTicksToDelay);
 
 #ifdef __cplusplus
 }
