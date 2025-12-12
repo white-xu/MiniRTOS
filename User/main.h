@@ -17,6 +17,7 @@
 
 #include "MiniRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 #ifdef __cplusplus
 }

@@ -4,6 +4,8 @@
 
 MiniRTOS就是精简FreeRTOS的代码，通过学习本程序的代码，可以帮助你快速上手FreeRTOS/无缝衔接等等
 core-development分支包含测试通过的重点功能开发进度，使用它可以深入学习FreeRTOS源码
+->
+MiniRTOS是精简FreeRTOS的源码：提供了一个功能少但简单的RTOS，并且学习其API函数不会增加学习成本——FreeRTOS是应用广泛的实时操作系统；为想要研读FreeRTOS代码的人员提供了一种门槛更低的途径。通过查看历史提交的方式，还可以进一步简化研读的压力
 
 ### 从0开始构建一个RTOS
 

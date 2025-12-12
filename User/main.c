@@ -2,109 +2,136 @@
 
 static void SystemClock_Config(void);
 
-#define TASK1_TASK_PRIO 2
+#define TASK1_TASK_PRIO 3
 #define TASK1_STK_SIZE 560
 TaskHandle_t Task1Task_Handler;
 static void task1_task(void *pvParameters);
 
-#define TASK2_TASK_PRIO 3
+#define TASK2_TASK_PRIO 2
 #define TASK2_STK_SIZE 560
 TaskHandle_t Task2Task_Handler;
 static void task2_task(void *pvParameters);
+
+#define QUEUE_LENGTH 5
+#define ITEM_SIZE sizeof(uint32_t)
+static QueueHandle_t xQueue = NULL;
+static uint32_t task2_receive_buf[QUEUE_LENGTH];
+static uint8_t task2_receive_index;
 
 /**
  * @brief main
  */
 int main(void)
 {
-  HAL_Init();
+	HAL_Init();
 
-  SystemClock_Config();
+	SystemClock_Config();
 
-  DEBUG_USART_Config();
+	CPU_TS_TmrInit();
+	DEBUG_USART_Config();
 
-  cm_backtrace_init("MiniRTOS_Debug", "V1.0.0", "V1.0.0");
+	cm_backtrace_init("MiniRTOS_Debug", "V1.0.0", "V1.0.0");
 
-  BaseType_t ret;
-  ret = xTaskCreate((TaskFunction_t)task1_task,
-                    (const char *)"task1_task",
-                    (uint16_t)TASK1_STK_SIZE,
-                    (void *)NULL,
-                    (UBaseType_t)TASK1_TASK_PRIO,
-                    (TaskHandle_t *)&Task1Task_Handler);
-  if (ret == pdPASS)
-  {
-    PRINT_INFO("task1 create successfully");
-  }
-  else
-  {
-    PRINT_INFO("task1 create failed");
-  }
+	xQueue = xQueueCreate(QUEUE_LENGTH, ITEM_SIZE);
+    if (xQueue != NULL)
+    {
+        printf("Queue created successfully!\n");
+    }
+    else
+    {
+        printf("Queue creation failed!\n");
+        while(1);
+    }
 
-  ret = xTaskCreate((TaskFunction_t)task2_task,
-                    (const char *)"task2_task",
-                    (uint16_t)TASK2_STK_SIZE,
-                    (void *)NULL,
-                    (UBaseType_t)TASK2_TASK_PRIO,
-                    (TaskHandle_t *)&Task2Task_Handler);
-  if (ret == pdPASS)
-  {
-    PRINT_INFO("task2 create successfully");
-  }
-  else
-  {
-    PRINT_INFO("task2 create failed");
-  }
+	BaseType_t ret;
+	ret = xTaskCreate((TaskFunction_t)task1_task,
+					  (const char *)"task1_task",
+					  (uint16_t)TASK1_STK_SIZE,
+					  (void *)NULL,
+					  (UBaseType_t)TASK1_TASK_PRIO,
+					  (TaskHandle_t *)&Task1Task_Handler);
+	if (ret == pdPASS)
+	{
+		PRINT_INFO("task1 create successfully");
+	}
+	else
+	{
+		PRINT_INFO("task1 create failed");
+		while(1);
+	}
 
-  vTaskStartScheduler();
+	ret = xTaskCreate((TaskFunction_t)task2_task,
+					  (const char *)"task2_task",
+					  (uint16_t)TASK2_STK_SIZE,
+					  (void *)NULL,
+					  (UBaseType_t)TASK2_TASK_PRIO,
+					  (TaskHandle_t *)&Task2Task_Handler);
+	if (ret == pdPASS)
+	{
+		PRINT_INFO("task2 create successfully");
+	}
+	else
+	{
+		PRINT_INFO("task2 create failed");
+		while(1);
+	}
 
-  while (1)
-  {
-    PRINT_INFO("It shouldn't run here");
-	while(1);
-  }
+	vTaskStartScheduler();
+
+	while (1)
+	{
+		PRINT_INFO("It shouldn't run here");
+		while (1)
+			;
+	}
 }
 
 static void task1_task(void *pvParameters)
 {
-  uint32_t count1 = 0;
+    BaseType_t xStatus;
+	uint32_t data_to_send = 0;
 
-  PRINT_INFO("enter task1");
+	PRINT_INFO("Producer task started");
 
-  while (1)
-  {
-    count1++;
-    PRINT_INFO("task1 run count: %lu", count1);
-    if (count1 <= 2)
+    while (1)
     {
-      vTaskDelay(pdMS_TO_TICKS(1000));
+		for(uint8_t i=0; i<5; i++)
+		{
+			PRINT_INFO("task2 receive data:%lu", task2_receive_buf[i]);
+		}
+
+        data_to_send++;
+        xStatus = xQueueSend(xQueue, &data_to_send, portMAX_DELAY);
+        if (xStatus == pdPASS)
+        {
+            PRINT_INFO("task1 sent data:%lu",data_to_send);
+        }
+
+		Delay_ms(2000);
     }
-    else if (count1 == 3)
-    {
-      PRINT_INFO("task1 suspend scheduler");
-      vTaskSuspendAll();
-    }
-    else if (count1 >= 5)
-    {
-      PRINT_INFO("task1 resume scheduler");
-      xTaskResumeAll();
-      count1 = 0;
-    }
-  }
 }
 
 static void task2_task(void *pvParameters)
 {
-  uint32_t count2 = 0;
+	BaseType_t xStatus;
 
-  PRINT_INFO("enter task2");
+	PRINT_INFO("Consumer task started");
 
-  while (1)
-  {
-    count2++;
-    PRINT_INFO("task2 run count: %lu", count2);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-  }
+	while (1)
+	{
+		/* 从队列接收数据 */
+		xStatus = xQueueReceive(xQueue, &task2_receive_buf[task2_receive_index], portMAX_DELAY);
+		task2_receive_index++;
+		if(task2_receive_index >= QUEUE_LENGTH)
+		{
+			task2_receive_index = 0;
+		}
+
+		if (xStatus != pdPASS)
+		{
+			PRINT_INFO("Consumer: Failed to receive data\n");
+		}
+	}
 }
 
 /**

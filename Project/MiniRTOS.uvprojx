@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>..\Output\</OutputDirectory>
-          <OutputName>LwIP_F407</OutputName>
+          <OutputName>MiniRTOS</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -419,6 +419,11 @@
               <FileName>task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MiniRTOS\task.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MiniRTOS\queue.c</FilePath>
             </File>
           </Files>
         </Group>

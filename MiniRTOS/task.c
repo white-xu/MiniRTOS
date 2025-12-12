@@ -86,7 +86,7 @@ static volatile UBaseType_t uxSchedulerSuspended = (UBaseType_t)pdFALSE;
 static void prvResetNextTaskUnblockTime(void);
 /*-----------------------------------------------------------*/
 
-/*任务创建*/
+/*任务创建相关*/
 static void prvInitialiseNewTask(TaskFunction_t pxTaskCode,
                                  const char *const pcName,
                                  const uint32_t ulStackDepth,
@@ -373,7 +373,7 @@ BaseType_t xTaskResumeAll(void)
 }
 /*-----------------------------------------------------------*/
 
-/*任务延时*/
+/*任务延时相关*/
 static void prvResetNextTaskUnblockTime(void)
 {
     TCB_t *pxTCB;
@@ -503,26 +503,118 @@ BaseType_t xTaskIncrementTick(void)
         ++uxPendedTicks;
     }
 
-    if( xYieldPending != pdFALSE )
-	{
-		xSwitchRequired = pdTRUE;
-	}
+    if (xYieldPending != pdFALSE)
+    {
+        xSwitchRequired = pdTRUE;
+    }
 
     return xSwitchRequired;
 }
+/*-----------------------------------------------------------*/
 
 /**
  * @brief 执行任务切换
  */
 void vTaskSwitchContext(void)
 {
-    if( uxSchedulerSuspended != ( UBaseType_t ) pdFALSE )
-	{
-		xYieldPending = pdTRUE;
-	}
+    if (uxSchedulerSuspended != (UBaseType_t)pdFALSE)
+    {
+        xYieldPending = pdTRUE;
+    }
     else
     {
         xYieldPending = pdFALSE;
         taskSELECT_HIGHEST_PRIORITY_TASK();
     }
 }
+/*-----------------------------------------------------------*/
+
+/*支持队列*/
+BaseType_t xTaskRemoveFromEventList(const List_t *const pxEventList)
+{
+    TCB_t *pxUnblockedTCB;
+    BaseType_t xReturn;
+
+    pxUnblockedTCB = (TCB_t *)listGET_OWNER_OF_HEAD_ENTRY(pxEventList);
+    configASSERT(pxUnblockedTCB);
+    (void)uxListRemove(&(pxUnblockedTCB->xEventListItem));
+
+    if (uxSchedulerSuspended == (UBaseType_t)pdFALSE)
+    {
+        (void)uxListRemove(&(pxUnblockedTCB->xStateListItem));
+        prvAddTaskToReadyList(pxUnblockedTCB);
+    }
+    else
+    {
+        vListInsertEnd(&(xPendingReadyList), &(pxUnblockedTCB->xEventListItem));
+    }
+
+    if (pxUnblockedTCB->uxPriority > pxCurrentTCB->uxPriority)
+    {
+        xReturn = pdTRUE;
+
+        /* Mark that a yield is pending in case the user is not using the
+        "xHigherPriorityTaskWoken" parameter to an ISR safe FreeRTOS function. */
+        xYieldPending = pdTRUE;
+    }
+    else
+    {
+        xReturn = pdFALSE;
+    }
+
+    return xReturn;
+}
+
+void vTaskSetTimeOutState(TimeOut_t *const pxTimeOut)
+{
+    configASSERT(pxTimeOut);
+    pxTimeOut->xOverflowCount = xNumOfOverflows;
+    pxTimeOut->xTimeOnEntering = xTickCount;
+}
+
+BaseType_t xTaskCheckForTimeOut(TimeOut_t *const pxTimeOut, TickType_t *const pxTicksToWait)
+{
+    BaseType_t xReturn;
+
+    configASSERT(pxTimeOut);
+    configASSERT(pxTicksToWait);
+
+    taskENTER_CRITICAL();
+    {
+        /* Minor optimisation.  The tick count cannot change in this block. */
+        const TickType_t xConstTickCount = xTickCount;
+
+        if ((xNumOfOverflows != pxTimeOut->xOverflowCount) && (xConstTickCount >= pxTimeOut->xTimeOnEntering)) /*lint !e525 Indentation preferred as is to make code within pre-processor directives clearer. */
+        {
+            xReturn = pdTRUE;
+        }
+        else if (((TickType_t)(xConstTickCount - pxTimeOut->xTimeOnEntering)) < *pxTicksToWait) /*lint !e961 Explicit casting is only redundant with some compilers, whereas others require it to prevent integer conversion errors. */
+        {
+            *pxTicksToWait -= (xConstTickCount - pxTimeOut->xTimeOnEntering);
+            vTaskSetTimeOutState(pxTimeOut);
+            xReturn = pdFALSE;
+        }
+        else
+        {
+            xReturn = pdTRUE;
+        }
+    }
+    taskEXIT_CRITICAL();
+
+    return xReturn;
+}
+
+void vTaskPlaceOnEventList( List_t * const pxEventList, const TickType_t xTicksToWait )
+{
+	configASSERT( pxEventList );
+
+	vListInsert( pxEventList, &( pxCurrentTCB->xEventListItem ) );
+
+	prvAddCurrentTaskToDelayedList( xTicksToWait);
+}
+
+void vTaskMissedYield( void )
+{
+	xYieldPending = pdTRUE;
+}
+/*-----------------------------------------------------------*/
