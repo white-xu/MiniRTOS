@@ -1,7 +1,7 @@
 #include "list.h"
 
 /**
- * @brief 初始化链表。次函数会初始化链表结构中的所以成员，并将xListEnd项插入到链表中
+ * @brief 初始化链表。此函数会初始化链表结构中的所有成员，并将xListEnd项插入到链表中
  *        作为链表尾部的标记
  */
 void vListInitialise( List_t * const pxList )

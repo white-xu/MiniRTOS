@@ -42,7 +42,8 @@
         "arch.h": "c",
         "protable.h": "c",
         "stdlib.h": "c",
-        "minirtos.h": "c"
+        "minirtos.h": "c",
+        "portmacro.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

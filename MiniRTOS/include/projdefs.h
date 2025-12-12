@@ -15,4 +15,7 @@ typedef void (*TaskFunction_t)( void * );
 #define pdPASS			( pdTRUE )
 #define pdFAIL			( pdFALSE )
 
+/* FreeRTOS error definitions. */
+#define errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY	( -1 )
+
 #endif

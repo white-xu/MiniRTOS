@@ -1,8 +1,5 @@
 #include "main.h"
 
-extern void *pvPortMalloc(size_t xWantedSize);
-extern void vPortFree(void *pv);
-
 static void SystemClock_Config(void);
 
 /**
@@ -16,18 +13,6 @@ int main(void)
 
   CPU_TS_TmrInit();
   DEBUG_USART_Config();
-
-  uint8_t *data = (uint8_t *)pvPortMalloc((size_t)10);
-  if (data != NULL)
-  {
-    printf("address: %p\n", (void *)data);
-
-    vPortFree(data);
-  }
-  else
-  {
-    printf("Memory allocation failed!\n");
-  }
 
   while (1)
   {
