@@ -1,0 +1,27 @@
+//modified by liujun
+//20221222, 不删除 *.uvoptx, 避免仿真器配置信息丢失
+//20230206, 不删除*.hex
+*.crf
+*.d
+*.o
+*.lst
+*.axf
+*.htm
+*.html
+*.lnp
+*.map
+*.sct
+*.dep
+*.uvopt
+*.dbgconf
+*.uvgui.*
+*.uvguix.*
+*.Administrator
+JLinkLog.txt
+*.bin
+*.scvd
+*.bak
+*.iex
+*.__i
+*.icf
+*.mxproject
