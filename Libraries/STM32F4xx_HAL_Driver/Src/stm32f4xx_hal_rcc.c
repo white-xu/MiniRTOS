@@ -708,8 +708,8 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
   /* Update the SystemCoreClock global variable */
   SystemCoreClock = HAL_RCC_GetSysClockFreq() >> AHBPrescTable[(RCC->CFGR & RCC_CFGR_HPRE)>> RCC_CFGR_HPRE_Pos];
 
-  /* Configure the source of time base considering new system clocks settings */
-  HAL_InitTick (TICK_INT_PRIORITY);
+  // /* Configure the source of time base considering new system clocks settings */
+  // HAL_InitTick (TICK_INT_PRIORITY);
 
   return HAL_OK;
 }
@@ -898,7 +898,8 @@ __weak uint32_t HAL_RCC_GetSysClockFreq(void)
       if(__HAL_RCC_GET_PLL_OSCSOURCE() != RCC_PLLSOURCE_HSI)
       {
         /* HSE used as PLL clock source */
-        pllvco = (uint32_t) ((((uint64_t) HSE_VALUE * ((uint64_t) ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos)))) / (uint64_t)pllm);
+        // pllvco = (uint32_t) ((((uint64_t) HSE_VALUE * ((uint64_t) ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos)))) / (uint64_t)pllm);
+        pllvco = (uint32_t) ((((uint64_t) HSE_VALUE / (uint64_t)pllm) * ((uint64_t) ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos))));
       }
       else
       {

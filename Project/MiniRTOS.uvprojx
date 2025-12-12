@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\User;..\MiniRTOS\include;..\MiniRTOS\protable\RVDS;..\HAL;..\SYSTEM;..\Libraries\STM32F4xx_HAL_Driver\Inc;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\CMSIS\Include</IncludePath>
+              <IncludePath>..\User;..\cm_backtrace;..\MiniRTOS\include;..\MiniRTOS\protable\RVDS;..\HAL;..\SYSTEM;..\Libraries\STM32F4xx_HAL_Driver\Inc;..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\Libraries\CMSIS\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -389,6 +389,21 @@
               <FileName>stm32f4xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\stm32f4xx_it.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CmBacktrace</GroupName>
+          <Files>
+            <File>
+              <FileName>cm_backtrace.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cm_backtrace\cm_backtrace.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmb_fault.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\cm_backtrace\fault_handler\keil\cmb_fault.S</FilePath>
             </File>
           </Files>
         </Group>

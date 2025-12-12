@@ -14,10 +14,10 @@ extern "C" {
 #define portSTACK_TYPE	uint32_t
 #define portBASE_TYPE	long
 
-typedef portSTACK_TYPE StackType_t;
-typedef long BaseType_t;
-typedef unsigned long UBaseType_t;
-typedef uint32_t TickType_t;
+typedef portSTACK_TYPE StackType_t;		/*uint32_t*/
+typedef long BaseType_t;				/*long*/
+typedef unsigned long UBaseType_t;		/*unsigned long*/
+typedef uint32_t TickType_t;			/*uint32_t*/
 
 #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
 /*-----------------------------------------------------------*/
@@ -34,7 +34,7 @@ extern void vPortExitCritical( void );
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	vPortSetBASEPRI(x)
 /*-----------------------------------------------------------*/
 
-/*触发PendSV异常*/
+/*PendSV异常相关*/
 #define portSY_FULL_READ_WRITE		( 15 )	/*与内存屏障内联函数相关的常量*/
 #define portNVIC_INT_CTRL_REG		( * ( ( volatile uint32_t * ) 0xe000ed04 ) )
 #define portNVIC_PENDSVSET_BIT		( 1UL << 28UL )
@@ -49,7 +49,7 @@ extern void vPortExitCritical( void );
 #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/
 
-/**/
+/*中断优先级配置*/
 #define configPRIO_BITS       		                    4
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY			15     
 #define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5 
@@ -57,12 +57,19 @@ extern void vPortExitCritical( void );
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 /*-----------------------------------------------------------*/
 
-/**/
+/*就绪任务优先级位图操作*/
 #define portRECORD_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) |= ( 1UL << ( uxPriority ) )
 #define portRESET_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) &= ~( 1UL << ( uxPriority ) )
 #define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31UL - ( uint32_t ) __clz( ( uxReadyPriorities ) ) )
 /*-----------------------------------------------------------*/
 
+/*
+ *内核寄存器BASEPRI——Base Priority Mask Register.BASEPRI寄存器定义了异常处理的最低优先级。
+ *当BASEPRI被设置为非零值时，它会阻止激活所有(逻辑)优先级与BASEPRI值相同或更低的异常
+ *
+ * 内核寄存器IPSR——Interrupt Program Status Register.IPSR寄存器包含了当前正在执行的中断服
+ * 务程序（ISR）的异常类型编号
+*/
 static __forceinline void vPortSetBASEPRI( uint32_t ulBASEPRI )
 {
 	__asm

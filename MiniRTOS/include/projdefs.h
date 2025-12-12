@@ -6,7 +6,7 @@
  */
 typedef void (*TaskFunction_t)( void * );
 
-#define configTICK_RATE_HZ						  (( TickType_t )1000)
+#define configTICK_RATE_HZ						  (( TickType_t )12)
 #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000 ) )
 
 #define pdFALSE			( ( BaseType_t ) 0 )

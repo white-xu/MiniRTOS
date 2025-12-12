@@ -13,6 +13,11 @@
 #include "Debug/debug.h"
 #include "Delay/delay.h"
 
+#include "cm_backtrace.h"
+
+#include "MiniRTOS.h"
+#include "task.h"
+
 #ifdef __cplusplus
 }
 #endif

@@ -9,7 +9,8 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "STM32F407xx"
+                "STM32F407xx",
+                "__CC_ARM"
             ],
             "windowsSdkVersion": "10.0.26100.0",
             "cStandard": "c17",
