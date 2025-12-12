@@ -40,6 +40,13 @@ void vTaskStartScheduler(void);
 BaseType_t xTaskIncrementTick(void);
 void vTaskSwitchContext(void);
 void vTaskDelay(const TickType_t xTicksToDelay);
+void vTaskSuspendAll(void);
+BaseType_t xTaskResumeAll(void);
+
+BaseType_t xTaskRemoveFromEventList( const List_t * const pxEventList );                            /*暂时未实现(避免编译器报错)*/
+void vTaskSetTimeOutState( TimeOut_t * const pxTimeOut );                                           /*暂时未实现(避免编译器报错)*/
+BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut, TickType_t * const pxTicksToWait );   /*暂时未实现(避免编译器报错)*/
+void vTaskPlaceOnEventList( List_t * const pxEventList, const TickType_t xTicksToWait );            /*暂时未实现(避免编译器报错)*/
 
 #ifdef __cplusplus
 }

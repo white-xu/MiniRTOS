@@ -17,107 +17,94 @@ static void task2_task(void *pvParameters);
  */
 int main(void)
 {
-	HAL_Init();
+  HAL_Init();
 
-	SystemClock_Config();
+  SystemClock_Config();
 
-	CPU_TS_TmrInit();
-	DEBUG_USART_Config();
-	
-	cm_backtrace_init("MiniRTOS_Debug", "V1.0.0", "V1.0.0");
+  DEBUG_USART_Config();
 
-	printf("print");
-	printf("print");
-	printf("print");
-	printf("print");
+  cm_backtrace_init("MiniRTOS_Debug", "V1.0.0", "V1.0.0");
 
-	BaseType_t ret;
-	ret = xTaskCreate((TaskFunction_t )task1_task,
-	            	(const char*    )"task1_task",
-	            	(uint16_t       )TASK1_STK_SIZE,
-	            	(void*          )NULL,
-	            	(UBaseType_t    )TASK1_TASK_PRIO,
-	            	(TaskHandle_t*  )&Task1Task_Handler);
-	if(ret == pdPASS)
-	{
-		PRINT_INFO("task1 create successfully");
-	}
-	else
-	{
-		PRINT_INFO("task1 create failed");
-	}
+  BaseType_t ret;
+  ret = xTaskCreate((TaskFunction_t)task1_task,
+                    (const char *)"task1_task",
+                    (uint16_t)TASK1_STK_SIZE,
+                    (void *)NULL,
+                    (UBaseType_t)TASK1_TASK_PRIO,
+                    (TaskHandle_t *)&Task1Task_Handler);
+  if (ret == pdPASS)
+  {
+    PRINT_INFO("task1 create successfully");
+  }
+  else
+  {
+    PRINT_INFO("task1 create failed");
+  }
 
-	ret = xTaskCreate((TaskFunction_t )task2_task,
-	            	(const char*    )"task2_task",
-	            	(uint16_t       )TASK2_STK_SIZE,
-	            	(void*          )NULL,
-	            	(UBaseType_t    )TASK2_TASK_PRIO,
-	            	(TaskHandle_t*  )&Task2Task_Handler);
-	if(ret == pdPASS)
-	{
-		PRINT_INFO("task2 create successfully");
-	}
-	else
-	{
-		PRINT_INFO("task2 create failed");
-	}
+  ret = xTaskCreate((TaskFunction_t)task2_task,
+                    (const char *)"task2_task",
+                    (uint16_t)TASK2_STK_SIZE,
+                    (void *)NULL,
+                    (UBaseType_t)TASK2_TASK_PRIO,
+                    (TaskHandle_t *)&Task2Task_Handler);
+  if (ret == pdPASS)
+  {
+    PRINT_INFO("task2 create successfully");
+  }
+  else
+  {
+    PRINT_INFO("task2 create failed");
+  }
 
-	vTaskStartScheduler();
+  vTaskStartScheduler();
 
-	while (1)
-	{
-		PRINT_INFO("裸机运行没问题");
-		Delay_ms(1000);
-		Delay_ms(1000);
-	}
+  while (1)
+  {
+    PRINT_INFO("It shouldn't run here");
+	while(1);
+  }
 }
 
-// static void task1_task(void *pvParameters)
-// {
-//     static uint32_t count1 = 0;
-// 	const uint32_t print_interval = 80000000;	/*大概6s的延时*/
-
-// 	PRINT_INFO("enter task1");
-
-// 	while (1)
-// 	{
-// 		count1++;
-
-// 		if (count1 >= print_interval)
-// 		{
-// 			PRINT_INFO("task1:%lu (total loops)", count1);
-// 			count1 = 0;
-// 		}
-// 	}
-// }
-
-//任务都处于阻塞状态,空闲任务运行
 static void task1_task(void *pvParameters)
 {
-    static uint32_t count1 = 0;
+  uint32_t count1 = 0;
 
-	PRINT_INFO("enter task1");
+  PRINT_INFO("enter task1");
 
-	while (1)
-	{
-		count1++;
-		PRINT_INFO("task1:%lu (total loops)", count1);
-		vTaskDelay(pdMS_TO_TICKS(1500));
-	}
+  while (1)
+  {
+    count1++;
+    PRINT_INFO("task1 run count: %lu", count1);
+    if (count1 <= 2)
+    {
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    else if (count1 == 3)
+    {
+      PRINT_INFO("task1 suspend scheduler");
+      vTaskSuspendAll();
+    }
+    else if (count1 >= 5)
+    {
+      PRINT_INFO("task1 resume scheduler");
+      xTaskResumeAll();
+      count1 = 0;
+    }
+  }
 }
 
 static void task2_task(void *pvParameters)
 {
-    static uint32_t count2 = 0;
+  uint32_t count2 = 0;
 
-	PRINT_INFO("enter task2");
+  PRINT_INFO("enter task2");
 
-	while (1)
-	{
-		count2++;
-		PRINT_INFO("task2:%lu (total loops)", count2);
-		vTaskDelay(pdMS_TO_TICKS(1000));
-	}
+  while (1)
+  {
+    count2++;
+    PRINT_INFO("task2 run count: %lu", count2);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
 }
 
 /**
