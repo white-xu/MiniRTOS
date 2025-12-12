@@ -37,6 +37,9 @@ void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
 		pxIterator = pxList->xListEnd.pxPrevious;
     else
         for( pxIterator = ( ListItem_t * ) &( pxList->xListEnd ); pxIterator->pxNext->xItemValue <= xValueOfInsertion; pxIterator = pxIterator->pxNext )
+        {
+            
+        }
 
     pxNewListItem->pxNext = pxIterator->pxNext;
 	pxNewListItem->pxNext->pxPrevious = pxNewListItem;

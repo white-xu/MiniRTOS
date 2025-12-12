@@ -39,7 +39,10 @@
         "opt.h": "c",
         "tasks_upgrade.h": "c",
         "sys_arch.h": "c",
-        "arch.h": "c"
+        "arch.h": "c",
+        "protable.h": "c",
+        "stdlib.h": "c",
+        "minirtos.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
