@@ -45,30 +45,16 @@ typedef xQUEUE Queue_t;
 
 static void prvUnlockQueue(Queue_t *const pxQueue)
 {
-    /* THIS FUNCTION MUST BE CALLED WITH THE SCHEDULER SUSPENDED. */
-
-    /* The lock counts contains the number of extra data items placed or
-    removed from the queue while the queue was locked.  When a queue is
-    locked items can be added or removed, but the event lists cannot be
-    updated. */
     taskENTER_CRITICAL();
     {
         int8_t cTxLock = pxQueue->cTxLock;
 
-        /* See if data was added to the queue while it was locked. */
         while (cTxLock > queueLOCKED_UNMODIFIED)
         {
-            /* Data was posted while the queue was locked.  Are any tasks
-            blocked waiting for data to become available? */
-
-            /* Tasks that are removed from the event list will get added to
-            the pending ready list as the scheduler is still suspended. */
             if (listLIST_IS_EMPTY(&(pxQueue->xTasksWaitingToReceive)) == pdFALSE)
             {
                 if (xTaskRemoveFromEventList(&(pxQueue->xTasksWaitingToReceive)) != pdFALSE)
                 {
-                    /* The task waiting has a higher priority so record that
-                    a context switch is required. */
                     vTaskMissedYield();
                 }
             }
@@ -84,7 +70,6 @@ static void prvUnlockQueue(Queue_t *const pxQueue)
     }
     taskEXIT_CRITICAL();
 
-    /* Do the same for the Rx lock. */
     taskENTER_CRITICAL();
     {
         int8_t cRxLock = pxQueue->cRxLock;
@@ -178,7 +163,7 @@ static void prvCopyDataToQueue(Queue_t *const pxQueue, const void *pvItemToQueue
 
     uxMessagesWaiting = pxQueue->uxMessagesWaiting;
 
-    (void)memcpy((void *)pxQueue->pcWriteTo, pvItemToQueue, (size_t)pxQueue->uxItemSize); /*lint !e961 !e418 MISRA exception as the casts are only redundant for some ports, plus previous logic ensures a null pointer can only be passed to memcpy() if the copy size is 0. */
+    (void)memcpy((void *)pxQueue->pcWriteTo, pvItemToQueue, (size_t)pxQueue->uxItemSize);
     pxQueue->pcWriteTo += pxQueue->uxItemSize;
     if (pxQueue->pcWriteTo >= pxQueue->pcTail)
     {
@@ -293,12 +278,12 @@ BaseType_t xQueueSend(QueueHandle_t xQueue, const void *const pvItemToQueue, Tic
 static void prvCopyDataFromQueue(Queue_t *const pxQueue, void *const pvBuffer)
 {
     pxQueue->pcReadFrom += pxQueue->uxItemSize;
-    if (pxQueue->pcReadFrom >= pxQueue->pcTail) /*lint !e946 MISRA exception justified as use of the relational operator is the cleanest solutions. */
+    if (pxQueue->pcReadFrom >= pxQueue->pcTail)
     {
         pxQueue->pcReadFrom = pxQueue->pcHead;
     }
 
-    (void)memcpy((void *)pvBuffer, (void *)pxQueue->pcReadFrom, (size_t)pxQueue->uxItemSize); /*lint !e961 !e418 MISRA exception as the casts are only redundant for some ports.  Also previous logic ensures a null pointer can only be passed to memcpy() when the count is 0. */
+    (void)memcpy((void *)pvBuffer, (void *)pxQueue->pcReadFrom, (size_t)pxQueue->uxItemSize);
 }
 
 static BaseType_t prvIsQueueEmpty(const Queue_t *pxQueue)
